@@ -4,7 +4,7 @@ from exact_engine import ExactQueryEngine
 from approximate_engine import ApproximateEngine
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 CSV_PATH = "Sales_Product_Combined_cleaned.csv"
 
