@@ -8,7 +8,9 @@ def relative_error(exact_val, approx_val):
 
 
 
-exact = ExactQueryEngine('datasets/Sales_Product_Combined_cleaned.csv')
+import sys
+csv_path = sys.argv[1] if len(sys.argv) > 1 else 'datasets/Sales_Product_Combined_cleaned.csv'
+exact = ExactQueryEngine(csv_path)
 dataset = exact.GET_DF()
 approx = ApproximateEngine(dataset,sample_frac=0.1)
 
