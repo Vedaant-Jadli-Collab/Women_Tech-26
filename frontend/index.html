@@ -48,13 +48,13 @@
   <div class="grid-4" style="margin-bottom:20px;">
     <div class="kpi amber fade-up fade-up-1">
       <div class="kpi-icon">🗄️</div>
-      <div class="kpi-val">186,850</div>
+      <div class="kpi-val" id="kpi-total-rows">-</div>
       <div class="kpi-lbl">TOTAL ROWS</div>
       <div class="kpi-badge">Full dataset</div>
     </div>
     <div class="kpi blue fade-up fade-up-2">
       <div class="kpi-icon">🔬</div>
-      <div class="kpi-val">18,685</div>
+      <div class="kpi-val" id="kpi-sample-size">—</div>
       <div class="kpi-lbl">SAMPLE SIZE</div>
       <div class="kpi-badge">10% of dataset</div>
     </div>
@@ -66,9 +66,9 @@
     </div>
     <div class="kpi purple fade-up fade-up-4">
       <div class="kpi-icon">⚡</div>
-      <div class="kpi-val">5.8×</div>
+      <div class="kpi-val" id="kpi-speedup">—</div>
       <div class="kpi-lbl">AVG SPEEDUP</div>
-      <div class="kpi-badge">sample_frac 0.10</div>
+      <div class="kpi-badge" id="kpi-speedup-badge">sample_frac 0.10</div>
     </div>
   </div>
 
@@ -166,11 +166,6 @@
   <div class="qr-layout">
     <div class="card fade-up fade-up-1" style="height:fit-content;">
       <div style="margin-bottom:1.5rem;">
-        <div class="section-label">Upload CSV</div>
-        <input type="file" id="csv-upload" accept=".csv" onchange="handleFileUpload(this)" style="width:100%;padding:8px 0;font-size:.85rem;color:var(--muted);"/>
-        <div id="upload-status" style="margin-top:.4rem;font-size:.78rem;color:var(--muted);">No file loaded — using default data</div>
-      </div>
-      <div class="divider"></div>
       <div class="section-label">Select Query</div>
       <div class="query-list">
         <button class="query-btn active" onclick="selectQuery(this,'COUNT(*)')">
@@ -233,68 +228,43 @@
         <div class="compare-title mono">COUNT(*)</div>
         <div class="badge good">0.00% error</div>
       </div>
-      <div class="pair-vals">
-        <div class="val-box">
-          <div class="val-type">Exact</div>
-          <div class="val-num">186,850</div>
-        </div>
-        <div class="val-box approx-box">
-          <div class="val-type">Approx</div>
-          <div class="val-num" style="color:var(--blue)">186,850</div>
-        </div>
-      </div>
-      <div class="compare-stats">
-        <span class="stat-speed">⚡ 3.2× faster</span>
-        <span class="stat-err">✔ Reliable</span>
-      </div>
-    </div>
-    <div class="compare-card fade-up fade-up-2">
-      <div class="compare-header">
-        <div class="compare-title mono">SUM(price)</div>
-        <div class="badge warn">0.19% error</div>
-      </div>
-      <div class="pair-vals">
-        <div class="val-box">
-          <div class="val-type">Exact</div>
-          <div class="val-num">34,492,035</div>
-        </div>
-        <div class="val-box approx-box">
-          <div class="val-type">Approx</div>
-          <div class="val-num" style="color:var(--blue)">34,556,712</div>
-        </div>
-      </div>
-      <div class="compare-stats">
-        <span class="stat-speed">⚡ 5.8× faster</span>
-        <span class="stat-err">✔ Reliable</span>
-      </div>
-    </div>
-    <div class="compare-card fade-up fade-up-3">
-      <div class="compare-header">
-        <div class="compare-title mono">AVG(price)</div>
-        <div class="badge warn">0.19% error</div>
-      </div>
-      <div class="pair-vals">
-        <div class="val-box">
-          <div class="val-type">Exact</div>
-          <div class="val-num">184.58</div>
-        </div>
-        <div class="val-box approx-box">
-          <div class="val-type">Approx ± MoE</div>
-          <div class="val-num" style="color:var(--blue);font-size:1.15rem">184.93 ±1.81</div>
-        </div>
-      </div>
-      <div class="compare-stats">
-        <span class="stat-speed">⚡ 4.1× faster</span>
-        <span class="stat-err">95% CI</span>
-      </div>
-    </div>
+      <div class="compare-card fade-up fade-up-1" id="cmp-count">
+  <div class="compare-header">
+    <div class="compare-title mono">COUNT(*)</div>
+    <div class="badge" id="cmp-count-badge">—</div>
   </div>
-  <div class="card fade-up fade-up-4" style="margin-bottom:20px;">
-    <div class="card-label">AVG(price) — 95% Confidence Interval Visualized</div>
-    <div class="ci-visual">
-      <div class="ci-labels">
-        <span style="color:var(--amber)">183.12 (CI Low)</span>
-        <span style="color:var(--amber)">186.74 (CI High)</span>
+  <div class="pair-vals">
+    <div class="val-box"><div class="val-type">Exact</div><div class="val-num" id="cmp-count-exact">—</div></div>
+    <div class="val-box approx-box"><div class="val-type">Approx</div><div class="val-num" style="color:var(--blue)" id="cmp-count-approx">—</div></div>
+  </div>
+  <div class="compare-stats"><span class="stat-speed" id="cmp-count-speed">—</span></div>
+</div>
+
+<div class="compare-card fade-up fade-up-2" id="cmp-sum">
+  <div class="compare-header">
+    <div class="compare-title mono">SUM(price)</div>
+    <div class="badge" id="cmp-sum-badge">—</div>
+  </div>
+  <div class="pair-vals">
+    <div class="val-box"><div class="val-type">Exact</div><div class="val-num" id="cmp-sum-exact">—</div></div>
+    <div class="val-box approx-box"><div class="val-type">Approx</div><div class="val-num" style="color:var(--blue)" id="cmp-sum-approx">—</div></div>
+  </div>
+  <div class="compare-stats"><span class="stat-speed" id="cmp-sum-speed">—</span></div>
+</div>
+
+<div class="compare-card fade-up fade-up-3" id="cmp-avg">
+  <div class="compare-header">
+    <div class="compare-title mono">AVG(price)</div>
+    <div class="badge" id="cmp-avg-badge">—</div>
+  </div>
+  <div class="pair-vals">
+    <div class="val-box"><div class="val-type">Exact</div><div class="val-num" id="cmp-avg-exact">—</div></div>
+    <div class="val-box approx-box"><div class="val-type">Approx ± MoE</div><div class="val-num" style="color:var(--blue);font-size:1.15rem" id="cmp-avg-approx">—</div></div>
+  </div>
+  <div class="compare-stats"><span class="stat-speed" id="cmp-avg-speed">—</span></div>
+</div>
+        <span style="color:var(--amber)" id="ci-low-label">— (CI Low)</span>
+        <span style="color:var(--amber)" id="ci-high-label">— (CI High)</span>
       </div>
       <div class="ci-bar-outer">
         <div class="ci-bar-fill" style="left:0%;right:0%;"></div>
@@ -302,11 +272,11 @@
         <div class="ci-bar-mark" style="left:calc(40% - 1.5px);background:var(--green);box-shadow:0 0 8px var(--green);"></div>
       </div>
       <div class="ci-labels">
-        <span style="color:var(--green);font-size:.68rem;">▲ Exact: 184.58</span>
-        <span style="color:var(--blue);font-size:.68rem;">▲ Approx: 184.93</span>
+        <span style="color:var(--green);font-size:.68rem;" id="ci-exact-label">▲ Exact: —</span>
+        <span style="color:var(--blue);font-size:.68rem;" id="ci-approx-label">▲ Approx: —</span>
       </div>
       <div class="ci-center">
-        Estimate <strong>184.93</strong> ± 1.81 &nbsp;|&nbsp; True value <span style="color:var(--green)">184.58</span> is within CI ✓
+        Estimate <strong id="ci-est">—</strong> ± <span id="ci-moe">—</span> &nbsp;|&nbsp; True value <span style="color:var(--green)" id="ci-true">—</span> is within CI ✓
       </div>
     </div>
   </div>
@@ -448,13 +418,7 @@
               <th>95% CI</th>
             </tr>
           </thead>
-          <tbody>
-            <tr><td class="mono">0.01</td><td>186.23</td><td><span class="badge warn">0.88%</span></td><td style="color:var(--green)">18.2×</td><td class="mono" style="font-size:.7rem;color:var(--muted)">[178.45, 194.01]</td></tr>
-            <tr><td class="mono">0.05</td><td>184.12</td><td><span class="badge good">0.25%</span></td><td style="color:var(--green)">8.7×</td><td class="mono" style="font-size:.7rem;color:var(--muted)">[182.31, 185.93]</td></tr>
-            <tr class="highlight"><td class="mono" style="color:var(--amber)">0.10 ★</td><td>184.93</td><td><span class="badge good">0.19%</span></td><td style="color:var(--green)">5.8×</td><td class="mono" style="font-size:.7rem;color:var(--muted)">[183.12, 186.74]</td></tr>
-            <tr><td class="mono">0.20</td><td>184.51</td><td><span class="badge good">0.04%</span></td><td style="color:var(--green)">3.1×</td><td class="mono" style="font-size:.7rem;color:var(--muted)">[183.89, 185.13]</td></tr>
-            <tr><td class="mono">0.50</td><td>184.60</td><td><span class="badge good">0.01%</span></td><td style="color:var(--green)">1.8×</td><td class="mono" style="font-size:.7rem;color:var(--muted)">[184.21, 184.99]</td></tr>
-            <tr><td class="mono">1.00</td><td>184.58</td><td><span class="badge good">0.00%</span></td><td style="color:var(--muted)">1.0×</td><td class="mono" style="font-size:.7rem;color:var(--muted)">[184.58, 184.58]</td></tr>
+          <tbody id="tradeoff-tbody">
           </tbody>
         </table>
       </div>
