@@ -26,10 +26,3 @@ def load_all_documents(data_dir: str) -> List[Any]:
             print(f"[ERROR] Failed to load PDF {pdf_file}: {e}")
 
     return documents
-
-# Example usage
-if __name__ == "__main__":
-    docs = load_all_documents("data")
-    print(f"Loaded {len(docs)} documents.")
-    print("Example document:", docs[0] if docs else None)
-
