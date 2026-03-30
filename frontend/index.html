@@ -48,7 +48,7 @@
   <div class="grid-4" style="margin-bottom:20px;">
     <div class="kpi amber fade-up fade-up-1">
       <div class="kpi-icon">🗄️</div>
-      <div class="kpi-val" id="kpi-total-rows">-</div>
+      <div class="kpi-val" id="kpi-total-rows">—</div>
       <div class="kpi-lbl">TOTAL ROWS</div>
       <div class="kpi-badge">Full dataset</div>
     </div>
@@ -158,6 +158,7 @@
     </div>
   </div>
 </main>
+
 <main class="page" id="pg-query">
   <div class="page-header fade-up">
     <div class="page-title">Query <span>Runner</span></div>
@@ -217,52 +218,51 @@
     </div>
   </div>
 </main>
+
 <main class="page" id="pg-comparison">
   <div class="page-header fade-up">
     <div class="page-title">Results <span>Comparison</span></div>
     <div class="page-sub">Side-by-side exact vs approximate — sample_frac=0.10 · 186,850 rows</div>
   </div>
   <div class="grid-3" style="margin-bottom:20px;">
-    <div class="compare-card fade-up fade-up-1">
+    <div class="compare-card fade-up fade-up-1" id="cmp-count">
       <div class="compare-header">
         <div class="compare-title mono">COUNT(*)</div>
-        <div class="badge good">0.00% error</div>
+        <div class="badge" id="cmp-count-badge">—</div>
       </div>
-      <div class="compare-card fade-up fade-up-1" id="cmp-count">
-  <div class="compare-header">
-    <div class="compare-title mono">COUNT(*)</div>
-    <div class="badge" id="cmp-count-badge">—</div>
+      <div class="pair-vals">
+        <div class="val-box"><div class="val-type">Exact</div><div class="val-num" id="cmp-count-exact">—</div></div>
+        <div class="val-box approx-box"><div class="val-type">Approx</div><div class="val-num" style="color:var(--blue)" id="cmp-count-approx">—</div></div>
+      </div>
+      <div class="compare-stats"><span class="stat-speed" id="cmp-count-speed">—</span></div>
+    </div>
+    <div class="compare-card fade-up fade-up-2" id="cmp-sum">
+      <div class="compare-header">
+        <div class="compare-title mono">SUM(price)</div>
+        <div class="badge" id="cmp-sum-badge">—</div>
+      </div>
+      <div class="pair-vals">
+        <div class="val-box"><div class="val-type">Exact</div><div class="val-num" id="cmp-sum-exact">—</div></div>
+        <div class="val-box approx-box"><div class="val-type">Approx</div><div class="val-num" style="color:var(--blue)" id="cmp-sum-approx">—</div></div>
+      </div>
+      <div class="compare-stats"><span class="stat-speed" id="cmp-sum-speed">—</span></div>
+    </div>
+    <div class="compare-card fade-up fade-up-3" id="cmp-avg">
+      <div class="compare-header">
+        <div class="compare-title mono">AVG(price)</div>
+        <div class="badge" id="cmp-avg-badge">—</div>
+      </div>
+      <div class="pair-vals">
+        <div class="val-box"><div class="val-type">Exact</div><div class="val-num" id="cmp-avg-exact">—</div></div>
+        <div class="val-box approx-box"><div class="val-type">Approx ± MoE</div><div class="val-num" style="color:var(--blue);font-size:1.15rem" id="cmp-avg-approx">—</div></div>
+      </div>
+      <div class="compare-stats"><span class="stat-speed" id="cmp-avg-speed">—</span></div>
+    </div>
   </div>
-  <div class="pair-vals">
-    <div class="val-box"><div class="val-type">Exact</div><div class="val-num" id="cmp-count-exact">—</div></div>
-    <div class="val-box approx-box"><div class="val-type">Approx</div><div class="val-num" style="color:var(--blue)" id="cmp-count-approx">—</div></div>
-  </div>
-  <div class="compare-stats"><span class="stat-speed" id="cmp-count-speed">—</span></div>
-</div>
-
-<div class="compare-card fade-up fade-up-2" id="cmp-sum">
-  <div class="compare-header">
-    <div class="compare-title mono">SUM(price)</div>
-    <div class="badge" id="cmp-sum-badge">—</div>
-  </div>
-  <div class="pair-vals">
-    <div class="val-box"><div class="val-type">Exact</div><div class="val-num" id="cmp-sum-exact">—</div></div>
-    <div class="val-box approx-box"><div class="val-type">Approx</div><div class="val-num" style="color:var(--blue)" id="cmp-sum-approx">—</div></div>
-  </div>
-  <div class="compare-stats"><span class="stat-speed" id="cmp-sum-speed">—</span></div>
-</div>
-
-<div class="compare-card fade-up fade-up-3" id="cmp-avg">
-  <div class="compare-header">
-    <div class="compare-title mono">AVG(price)</div>
-    <div class="badge" id="cmp-avg-badge">—</div>
-  </div>
-  <div class="pair-vals">
-    <div class="val-box"><div class="val-type">Exact</div><div class="val-num" id="cmp-avg-exact">—</div></div>
-    <div class="val-box approx-box"><div class="val-type">Approx ± MoE</div><div class="val-num" style="color:var(--blue);font-size:1.15rem" id="cmp-avg-approx">—</div></div>
-  </div>
-  <div class="compare-stats"><span class="stat-speed" id="cmp-avg-speed">—</span></div>
-</div>
+  <div class="card fade-up fade-up-4" style="margin-bottom:20px;">
+    <div class="card-label">AVG(price) — 95% Confidence Interval Visualized</div>
+    <div class="ci-visual">
+      <div class="ci-labels">
         <span style="color:var(--amber)" id="ci-low-label">— (CI Low)</span>
         <span style="color:var(--amber)" id="ci-high-label">— (CI High)</span>
       </div>
@@ -299,6 +299,7 @@
     </div>
   </div>
 </main>
+
 <main class="page" id="pg-tradeoff">
   <div class="page-header fade-up">
     <div class="page-title">Tradeoff <span>Analysis</span></div>
@@ -425,6 +426,7 @@
     </div>
   </div>
 </main>
+
 <script src="script.js"></script>
 </body>
 </html>
