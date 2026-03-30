@@ -7,7 +7,6 @@ def relative_error(exact_val, approx_val):
 
 
 
-
 import sys
 csv_path = sys.argv[1] if len(sys.argv) > 1 else 'datasets/Sales_Product_Combined_cleaned.csv'
 exact = ExactQueryEngine(csv_path)
@@ -132,24 +131,3 @@ print(f"{'AVERAGE':<15} {'':>12} {'':>12} "
 
 print(f"\nExact  time: {t_exact_group:.2f} ms")
 print(f"Naive  time: {t_naive_group:.2f} ms  →  speedup: {t_exact_group/t_naive_group:.1f}x")
-
-exact = ExactQueryEngine('datasets/synthetic_1M.csv')
-df    = exact.GET_DF()
-exact_avg = exact.AVG('price')
-
-print("── Accuracy Target Test ──\n")
-print(f"{'Target':>8} {'Frac':>6} {'Estimate':>10} {'Error%':>8} {'Speedup':>9}")
-print("─" * 48)
-
-for target in [0.80, 0.85, 0.90, 0.95, 0.97, 0.99, 1.00]:
-    eng             = ApproximateEngine(df, accuracy_target=target)
-    result, t_approx = eng._time_it(eng.AVG, 'price')
-    exact_r, t_exact = exact._time_it(exact.AVG, 'price')
-    
-    error   = relative_error(exact_avg, result['estimate'])
-    speedup = t_exact / t_approx
-    
-    print(f"{target:>8.2f} {eng.sample_frac:>6.2f} "
-          f"{result['estimate']:>10.2f} "
-          f"{error:>7.2f}% "
-          f"{speedup:>8.1f}x")
