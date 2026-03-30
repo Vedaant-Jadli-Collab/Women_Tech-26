@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AQP Insight Engine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-icon">⚡</div>
+    AQP <span>Insight</span> Engine
+  </div>
+  <nav class="nav-links">
+    <button class="nav-btn active" onclick="show('dashboard',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </button>
+    <button class="nav-btn" onclick="show('query',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 19,12 5,21"/></svg>
+      Query Runner
+    </button>
+    <button class="nav-btn" onclick="show('comparison',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h8M4 18h16"/></svg>
+      Comparison
+    </button>
+    <button class="nav-btn" onclick="show('tradeoff',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg>
+      Tradeoff
+    </button>
+  </nav>
+  <div class="status-pill">
+    <span class="pulse"></span>
+    Engine Active
+  </div>
+</header>
+
+<main class="page active" id="pg-dashboard">
+  <div class="page-header fade-up">
+    <div class="page-title">Dashboard <span>Overview</span></div>
+    <div class="page-sub">Real-time analytics from your Approximate Query Engine · Sales dataset · 186,850 rows</div>
+  </div>
+
+  <div class="grid-4" style="margin-bottom:20px;">
+    <div class="kpi amber fade-up fade-up-1">
+      <div class="kpi-icon">🗄️</div>
+      <div class="kpi-val">186,850</div>
+      <div class="kpi-lbl">TOTAL ROWS</div>
+      <div class="kpi-badge">Full dataset</div>
+    </div>
+    <div class="kpi blue fade-up fade-up-2">
+      <div class="kpi-icon">🔬</div>
+      <div class="kpi-val">18,685</div>
+      <div class="kpi-lbl">SAMPLE SIZE</div>
+      <div class="kpi-badge">10% of dataset</div>
+    </div>
+    <div class="kpi green fade-up fade-up-3">
+      <div class="kpi-icon">🎯</div>
+      <div class="kpi-val">95%</div>
+      <div class="kpi-lbl">ACCURACY TARGET</div>
+      <div class="kpi-badge">frac = 0.10</div>
+    </div>
+    <div class="kpi purple fade-up fade-up-4">
+      <div class="kpi-icon">⚡</div>
+      <div class="kpi-val">5.8×</div>
+      <div class="kpi-lbl">AVG SPEEDUP</div>
+      <div class="kpi-badge">sample_frac 0.10</div>
+    </div>
+  </div>
+
+  <div class="grid-3" style="margin-bottom:20px;">
+    <div class="card fade-up fade-up-2">
+      <div class="card-label">SUM(price) · Speedup</div>
+      <div class="metric-row">
+        <div class="metric-big" style="color:var(--green)">5.8×</div>
+        <div class="metric-lbl">Faster than exact query</div>
+      </div>
+    </div>
+    <div class="card fade-up fade-up-3">
+      <div class="card-label">SUM(price) · Error Rate</div>
+      <div class="metric-row">
+        <div class="metric-big" style="color:var(--amber)">0.19%</div>
+        <div class="metric-lbl">Relative error at frac=0.10</div>
+      </div>
+    </div>
+    <div class="card fade-up fade-up-4">
+      <div class="card-label">AVG(price) · Margin of Error</div>
+      <div class="metric-row">
+        <div class="metric-big" style="color:var(--blue)">±1.81</div>
+        <div class="metric-lbl">95% confidence interval</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card fade-up fade-up-5" style="margin-bottom:20px;">
+    <div class="card-label">Accuracy vs Speed Tradeoff · AVG(price) across sample fractions</div>
+    <div class="chart-legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Speedup (×)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div>Error %</div>
+    </div>
+    <div class="chart-wrap">
+      <svg class="chart" viewBox="0 0 800 220" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="gSpeed" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#4ade80" stop-opacity="0.25"/>
+            <stop offset="100%" stop-color="#4ade80" stop-opacity="0"/>
+          </linearGradient>
+          <linearGradient id="gErr" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#f5a623" stop-opacity="0.2"/>
+            <stop offset="100%" stop-color="#f5a623" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <line x1="80" y1="20" x2="780" y2="20" stroke="#1e2530" stroke-width="1"/>
+        <line x1="80" y1="60" x2="780" y2="60" stroke="#1e2530" stroke-width="1"/>
+        <line x1="80" y1="100" x2="780" y2="100" stroke="#1e2530" stroke-width="1"/>
+        <line x1="80" y1="140" x2="780" y2="140" stroke="#1e2530" stroke-width="1"/>
+        <line x1="80" y1="180" x2="780" y2="180" stroke="#1e2530" stroke-width="1"/>
+        <text x="70" y="24" text-anchor="end" fill="#6b7a8d" font-size="11" font-family="JetBrains Mono">18×</text>
+        <text x="70" y="64" text-anchor="end" fill="#6b7a8d" font-size="11" font-family="JetBrains Mono">13×</text>
+        <text x="70" y="104" text-anchor="end" fill="#6b7a8d" font-size="11" font-family="JetBrains Mono">9×</text>
+        <text x="70" y="144" text-anchor="end" fill="#6b7a8d" font-size="11" font-family="JetBrains Mono">5×</text>
+        <text x="70" y="184" text-anchor="end" fill="#6b7a8d" font-size="11" font-family="JetBrains Mono">1×</text>
+        <text x="130" y="210" text-anchor="middle" fill="#6b7a8d" font-size="11" font-family="JetBrains Mono">0.01</text>
+        <text x="250" y="210" text-anchor="middle" fill="#6b7a8d" font-size="11" font-family="JetBrains Mono">0.05</text>
+        <text x="390" y="210" text-anchor="middle" fill="#6b7a8d" font-size="11" font-family="JetBrains Mono">0.10</text>
+        <text x="530" y="210" text-anchor="middle" fill="#6b7a8d" font-size="11" font-family="JetBrains Mono">0.20</text>
+        <text x="660" y="210" text-anchor="middle" fill="#6b7a8d" font-size="11" font-family="JetBrains Mono">0.50</text>
+        <text x="770" y="210" text-anchor="middle" fill="#6b7a8d" font-size="11" font-family="JetBrains Mono">1.00</text>
+        <polygon points="130,22 250,65 390,98 530,155 660,168 770,180 770,180 660,180 530,180 390,180 250,180 130,180" fill="url(#gSpeed)"/>
+        <polyline points="130,22 250,65 390,98 530,155 660,168 770,180" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linejoin="round"/>
+        <polygon points="130,168 250,176 390,177 530,179 660,180 770,180 770,180 660,180 530,180 390,180 250,180 130,180" fill="url(#gErr)"/>
+        <polyline points="130,168 250,176 390,177 530,179 660,180 770,180" fill="none" stroke="#f5a623" stroke-width="2.5" stroke-linejoin="round" stroke-dasharray="5,3"/>
+        <circle cx="130" cy="22"  r="4.5" fill="#4ade80"/>
+        <circle cx="250" cy="65"  r="4.5" fill="#4ade80"/>
+        <circle cx="390" cy="98"  r="6" fill="#4ade80" stroke="#07090f" stroke-width="2"/>
+        <circle cx="530" cy="155" r="4.5" fill="#4ade80"/>
+        <circle cx="660" cy="168" r="4.5" fill="#4ade80"/>
+        <circle cx="770" cy="180" r="4.5" fill="#4ade80"/>
+        <line x1="390" y1="20" x2="390" y2="180" stroke="rgba(245,166,35,.3)" stroke-width="1" stroke-dasharray="4,3"/>
+        <text x="398" y="36" fill="#f5a623" font-size="10" font-family="JetBrains Mono">sweet spot</text>
+      </svg>
+    </div>
+  </div>
+  <div class="card fade-up fade-up-6">
+    <div class="card-label">Dataset Schema · Sales_Product_Combined_cleaned.csv</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;padding-top:14px;">
+      <span class="chip blue">order_id</span>
+      <span class="chip blue">Product</span>
+      <span class="chip blue">quantity</span>
+      <span class="chip blue">price</span>
+      <span class="chip blue">order_date</span>
+      <span class="chip blue">city</span>
+      <span style="margin-left:auto;font-size:.75rem;color:var(--muted);">186,850 rows · DuckDB engine</span>
+    </div>
+  </div>
+</main>
+<main class="page" id="pg-query">
+  <div class="page-header fade-up">
+    <div class="page-title">Query <span>Runner</span></div>
+    <div class="page-sub">Execute and compare exact vs approximate results in real-time</div>
+  </div>
+  <div class="qr-layout">
+    <div class="card fade-up fade-up-1" style="height:fit-content;">
+      <div style="margin-bottom:1.5rem;">
+        <div class="section-label">Upload CSV</div>
+        <input type="file" id="csv-upload" accept=".csv" onchange="handleFileUpload(this)" style="width:100%;padding:8px 0;font-size:.85rem;color:var(--muted);"/>
+        <div id="upload-status" style="margin-top:.4rem;font-size:.78rem;color:var(--muted);">No file loaded — using default data</div>
+      </div>
+      <div class="divider"></div>
+      <div class="section-label">Select Query</div>
+      <div class="query-list">
+        <button class="query-btn active" onclick="selectQuery(this,'COUNT(*)')">
+          <span class="query-dot"></span>COUNT(*)
+        </button>
+        <button class="query-btn" onclick="selectQuery(this,'SUM(price)')">
+          <span class="query-dot"></span>SUM(price)
+        </button>
+        <button class="query-btn" onclick="selectQuery(this,'AVG(price)')">
+          <span class="query-dot"></span>AVG(price)
+        </button>
+        <button class="query-btn" onclick="selectQuery(this,'GROUP BY Product')">
+          <span class="query-dot"></span>GROUP BY Product
+        </button>
+      </div>
+      <div class="divider"></div>
+      <div class="slider-wrap">
+        <div class="slider-header">
+          <div class="section-label" style="margin-bottom:0">Sample Fraction</div>
+          <div class="frac-val" id="frac-display">0.10</div>
+        </div>
+        <input type="range" id="frac-slider" min="1" max="100" value="10" oninput="updateSlider(this)"/>
+        <div style="display:flex;justify-content:space-between;font-size:.65rem;color:var(--muted);margin-top:6px;">
+          <span>0.01 · Fast</span><span>1.00 · Exact</span>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="section-label">Run Mode</div>
+      <div class="mode-group">
+        <button class="mode-btn" onclick="setMode(this,'exact')">Exact</button>
+        <button class="mode-btn" onclick="setMode(this,'approx')">Approx</button>
+        <button class="mode-btn active" onclick="setMode(this,'both')">Both</button>
+      </div>
+      <button class="exec-btn" id="exec-btn" onclick="runQuery()">
+        ▶ Execute Query
+      </button>
+    </div>
+    <div class="card fade-up fade-up-2" id="result-panel">
+      <div class="section-label">Results</div>
+      <div class="empty-state" id="empty-state">
+        <div class="empty-icon">⌁</div>
+        <div class="empty-txt">Select a query and click Execute</div>
+      </div>
+      <div id="result-content" style="display:none;"></div>
+      <div class="loading-state" id="loading-state" style="display:none;">
+        <div class="spinner"></div>
+        <div class="loading-txt">Processing query...</div>
+      </div>
+    </div>
+  </div>
+</main>
+<main class="page" id="pg-comparison">
+  <div class="page-header fade-up">
+    <div class="page-title">Results <span>Comparison</span></div>
+    <div class="page-sub">Side-by-side exact vs approximate — sample_frac=0.10 · 186,850 rows</div>
+  </div>
+  <div class="grid-3" style="margin-bottom:20px;">
+    <div class="compare-card fade-up fade-up-1">
+      <div class="compare-header">
+        <div class="compare-title mono">COUNT(*)</div>
+        <div class="badge good">0.00% error</div>
+      </div>
+      <div class="pair-vals">
+        <div class="val-box">
+          <div class="val-type">Exact</div>
+          <div class="val-num">186,850</div>
+        </div>
+        <div class="val-box approx-box">
+          <div class="val-type">Approx</div>
+          <div class="val-num" style="color:var(--blue)">186,850</div>
+        </div>
+      </div>
+      <div class="compare-stats">
+        <span class="stat-speed">⚡ 3.2× faster</span>
+        <span class="stat-err">✔ Reliable</span>
+      </div>
+    </div>
+    <div class="compare-card fade-up fade-up-2">
+      <div class="compare-header">
+        <div class="compare-title mono">SUM(price)</div>
+        <div class="badge warn">0.19% error</div>
+      </div>
+      <div class="pair-vals">
+        <div class="val-box">
+          <div class="val-type">Exact</div>
+          <div class="val-num">34,492,035</div>
+        </div>
+        <div class="val-box approx-box">
+          <div class="val-type">Approx</div>
+          <div class="val-num" style="color:var(--blue)">34,556,712</div>
+        </div>
+      </div>
+      <div class="compare-stats">
+        <span class="stat-speed">⚡ 5.8× faster</span>
+        <span class="stat-err">✔ Reliable</span>
+      </div>
+    </div>
+    <div class="compare-card fade-up fade-up-3">
+      <div class="compare-header">
+        <div class="compare-title mono">AVG(price)</div>
+        <div class="badge warn">0.19% error</div>
+      </div>
+      <div class="pair-vals">
+        <div class="val-box">
+          <div class="val-type">Exact</div>
+          <div class="val-num">184.58</div>
+        </div>
+        <div class="val-box approx-box">
+          <div class="val-type">Approx ± MoE</div>
+          <div class="val-num" style="color:var(--blue);font-size:1.15rem">184.93 ±1.81</div>
+        </div>
+      </div>
+      <div class="compare-stats">
+        <span class="stat-speed">⚡ 4.1× faster</span>
+        <span class="stat-err">95% CI</span>
+      </div>
+    </div>
+  </div>
+  <div class="card fade-up fade-up-4" style="margin-bottom:20px;">
+    <div class="card-label">AVG(price) — 95% Confidence Interval Visualized</div>
+    <div class="ci-visual">
+      <div class="ci-labels">
+        <span style="color:var(--amber)">183.12 (CI Low)</span>
+        <span style="color:var(--amber)">186.74 (CI High)</span>
+      </div>
+      <div class="ci-bar-outer">
+        <div class="ci-bar-fill" style="left:0%;right:0%;"></div>
+        <div class="ci-bar-mark" style="left:calc(50% - 1.5px);"></div>
+        <div class="ci-bar-mark" style="left:calc(40% - 1.5px);background:var(--green);box-shadow:0 0 8px var(--green);"></div>
+      </div>
+      <div class="ci-labels">
+        <span style="color:var(--green);font-size:.68rem;">▲ Exact: 184.58</span>
+        <span style="color:var(--blue);font-size:.68rem;">▲ Approx: 184.93</span>
+      </div>
+      <div class="ci-center">
+        Estimate <strong>184.93</strong> ± 1.81 &nbsp;|&nbsp; True value <span style="color:var(--green)">184.58</span> is within CI ✓
+      </div>
+    </div>
+  </div>
+  <div class="card fade-up fade-up-5">
+    <div class="card-label">GROUP BY Product — Exact vs Approximate Count</div>
+    <div style="margin-top:16px;overflow-x:auto;">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Exact Count</th>
+            <th>Approx Count</th>
+            <th>Error %</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="group-by-tbody">
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+<main class="page" id="pg-tradeoff">
+  <div class="page-header fade-up">
+    <div class="page-title">Tradeoff <span>Analysis</span></div>
+    <div class="page-sub">Explore speed vs accuracy at different sample fractions · AVG(price)</div>
+  </div>
+  <div class="rec-box fade-up">
+    <div class="rec-icon">💡</div>
+    <div>
+      <div class="rec-title">Smart Recommendation</div>
+      <div class="rec-text">
+        For a <strong>95% accuracy target</strong>, use <strong style="color:var(--amber)">sample_frac = 0.10</strong>.
+        You get <strong>5.8× speedup</strong> with only <strong>0.19% error</strong> — the optimal sweet spot for most analytical workloads.
+      </div>
+    </div>
+  </div>
+  <div class="card fade-up fade-up-1" style="margin-bottom:20px;">
+    <div class="card-label">Speed & Error vs Sample Fraction</div>
+    <div class="chart-legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Speedup (left axis)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div>Error % (right axis)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--amber);box-shadow:0 0 6px var(--amber);"></div>Recommended (0.10)</div>
+    </div>
+    <svg class="chart" viewBox="0 0 800 240" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="g2Speed" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#4ade80" stop-opacity="0.3"/>
+          <stop offset="100%" stop-color="#4ade80" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <line x1="80" y1="20" x2="760" y2="20" stroke="#1e2530" stroke-width="1"/>
+      <line x1="80" y1="65" x2="760" y2="65" stroke="#1e2530" stroke-width="1"/>
+      <line x1="80" y1="110" x2="760" y2="110" stroke="#1e2530" stroke-width="1"/>
+      <line x1="80" y1="155" x2="760" y2="155" stroke="#1e2530" stroke-width="1"/>
+      <line x1="80" y1="200" x2="760" y2="200" stroke="#1e2530" stroke-width="1"/>
+      <text x="70" y="24" text-anchor="end" fill="#6b7a8d" font-size="11" font-family="JetBrains Mono">18×</text>
+      <text x="70" y="69" text-anchor="end" fill="#6b7a8d" font-size="11" font-family="JetBrains Mono">13×</text>
+      <text x="70" y="114" text-anchor="end" fill="#6b7a8d" font-size="11" font-family="JetBrains Mono">9×</text>
+      <text x="70" y="159" text-anchor="end" fill="#6b7a8d" font-size="11" font-family="JetBrains Mono">5×</text>
+      <text x="70" y="204" text-anchor="end" fill="#6b7a8d" font-size="11" font-family="JetBrains Mono">1×</text>
+      <text x="130" y="225" text-anchor="middle" fill="#6b7a8d" font-size="11" font-family="JetBrains Mono">0.01</text>
+      <text x="250" y="225" text-anchor="middle" fill="#6b7a8d" font-size="11" font-family="JetBrains Mono">0.05</text>
+      <text x="390" y="225" text-anchor="middle" fill="#6b7a8d" font-size="11" font-family="JetBrains Mono">0.10</text>
+      <text x="510" y="225" text-anchor="middle" fill="#6b7a8d" font-size="11" font-family="JetBrains Mono">0.20</text>
+      <text x="630" y="225" text-anchor="middle" fill="#6b7a8d" font-size="11" font-family="JetBrains Mono">0.50</text>
+      <text x="730" y="225" text-anchor="middle" fill="#6b7a8d" font-size="11" font-family="JetBrains Mono">1.00</text>
+      <polygon points="130,20 250,66 390,104 510,158 630,170 730,200 730,200 630,200 510,200 390,200 250,200 130,200" fill="url(#g2Speed)"/>
+      <polyline points="130,20 250,66 390,104 510,158 630,170 730,200" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linejoin="round"/>
+      <polyline points="130,165 250,178 390,179 510,199 630,200 730,200" fill="none" stroke="#f5a623" stroke-width="2" stroke-dasharray="5,4" stroke-linejoin="round"/>
+      <circle cx="130" cy="20"  r="4" fill="#4ade80"/>
+      <circle cx="250" cy="66"  r="4" fill="#4ade80"/>
+      <circle cx="390" cy="104" r="7" fill="#4ade80" stroke="#07090f" stroke-width="2"/>
+      <circle cx="510" cy="158" r="4" fill="#4ade80"/>
+      <circle cx="630" cy="170" r="4" fill="#4ade80"/>
+      <circle cx="730" cy="200" r="4" fill="#4ade80"/>
+      <line x1="390" y1="18" x2="390" y2="200" stroke="rgba(245,166,35,.4)" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <text x="398" y="34" fill="#f5a623" font-size="10" font-family="JetBrains Mono">sweet spot</text>
+    </svg>
+  </div>
+  <div class="grid-2" style="gap:20px;">
+    <div class="card fade-up fade-up-2">
+      <div class="card-label">Accuracy Target → Sample Fraction Mapping</div>
+      <div style="margin-top:16px;">
+        <div class="acc-row">
+          <div class="acc-target">80%</div>
+          <div class="acc-bar-track"><div class="acc-bar-fill" style="width:1%"></div></div>
+          <div class="acc-frac">0.01</div>
+          <div class="acc-speed">18.2× fast</div>
+        </div>
+        <div class="acc-row">
+          <div class="acc-target">85%</div>
+          <div class="acc-bar-track"><div class="acc-bar-fill" style="width:2%"></div></div>
+          <div class="acc-frac">0.02</div>
+          <div class="acc-speed">~14× fast</div>
+        </div>
+        <div class="acc-row">
+          <div class="acc-target">90%</div>
+          <div class="acc-bar-track"><div class="acc-bar-fill" style="width:5%"></div></div>
+          <div class="acc-frac">0.05</div>
+          <div class="acc-speed">8.7× fast</div>
+        </div>
+        <div class="acc-row" style="background:var(--amber-dim);padding:12px 8px;border-radius:6px;margin:4px 0;">
+          <div class="acc-target" style="color:var(--amber)">95%</div>
+          <div class="acc-bar-track"><div class="acc-bar-fill" style="width:10%"></div></div>
+          <div class="acc-frac">0.10</div>
+          <div class="acc-speed">5.8× fast</div>
+        </div>
+        <div class="acc-row">
+          <div class="acc-target">97%</div>
+          <div class="acc-bar-track"><div class="acc-bar-fill" style="width:20%"></div></div>
+          <div class="acc-frac">0.20</div>
+          <div class="acc-speed">3.1× fast</div>
+        </div>
+        <div class="acc-row">
+          <div class="acc-target">99%</div>
+          <div class="acc-bar-track"><div class="acc-bar-fill" style="width:50%"></div></div>
+          <div class="acc-frac">0.50</div>
+          <div class="acc-speed">1.8× fast</div>
+        </div>
+        <div class="acc-row">
+          <div class="acc-target">100%</div>
+          <div class="acc-bar-track"><div class="acc-bar-fill" style="width:100%"></div></div>
+          <div class="acc-frac">1.00</div>
+          <div class="acc-speed">1.0× (exact)</div>
+        </div>
+      </div>
+    </div>
+    <div class="card fade-up fade-up-3">
+      <div class="card-label">Detailed Breakdown — AVG(price)</div>
+      <div style="margin-top:16px;overflow-x:auto;">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Frac</th>
+              <th>Estimate</th>
+              <th>Error %</th>
+              <th>Speedup</th>
+              <th>95% CI</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="mono">0.01</td><td>186.23</td><td><span class="badge warn">0.88%</span></td><td style="color:var(--green)">18.2×</td><td class="mono" style="font-size:.7rem;color:var(--muted)">[178.45, 194.01]</td></tr>
+            <tr><td class="mono">0.05</td><td>184.12</td><td><span class="badge good">0.25%</span></td><td style="color:var(--green)">8.7×</td><td class="mono" style="font-size:.7rem;color:var(--muted)">[182.31, 185.93]</td></tr>
+            <tr class="highlight"><td class="mono" style="color:var(--amber)">0.10 ★</td><td>184.93</td><td><span class="badge good">0.19%</span></td><td style="color:var(--green)">5.8×</td><td class="mono" style="font-size:.7rem;color:var(--muted)">[183.12, 186.74]</td></tr>
+            <tr><td class="mono">0.20</td><td>184.51</td><td><span class="badge good">0.04%</span></td><td style="color:var(--green)">3.1×</td><td class="mono" style="font-size:.7rem;color:var(--muted)">[183.89, 185.13]</td></tr>
+            <tr><td class="mono">0.50</td><td>184.60</td><td><span class="badge good">0.01%</span></td><td style="color:var(--green)">1.8×</td><td class="mono" style="font-size:.7rem;color:var(--muted)">[184.21, 184.99]</td></tr>
+            <tr><td class="mono">1.00</td><td>184.58</td><td><span class="badge good">0.00%</span></td><td style="color:var(--muted)">1.0×</td><td class="mono" style="font-size:.7rem;color:var(--muted)">[184.58, 184.58]</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+<script src="script.js"></script>
+</body>
+</html>
