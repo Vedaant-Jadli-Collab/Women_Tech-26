@@ -1,106 +1,6 @@
-let uploadedData = null;
+let DATA = {};
 
-function handleFileUpload(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const statusEl = document.getElementById('upload-status');
-  statusEl.textContent = `Loading "${file.name}"...`;
-  statusEl.style.color = 'var(--muted)';
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      const rows = parseCSV(e.target.result);
-      if (rows.length === 0) throw new Error('CSV appears to be empty');
-      uploadedData = rows;
-      computeDataFromCSV(rows);
-      statusEl.textContent = `✓ Loaded "${file.name}" — ${rows.length.toLocaleString()} rows`;
-      statusEl.style.color = '#4ade80';
-      resetResult();
-    } catch (err) {
-      statusEl.textContent = `✗ Error: ${err.message}`;
-      statusEl.style.color = '#f87171';
-    }
-  };
-  reader.readAsText(file);
-}
-
-function parseCSV(text) {
-  const lines = text.trim().split('\n');
-  const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
-  return lines.slice(1).map(line => {
-    const vals = line.split(',');
-    const row = {};
-    headers.forEach((h, i) => {
-      const v = (vals[i] || '').trim().replace(/"/g, '');
-      row[h] = isNaN(v) || v === '' ? v : parseFloat(v);
-    });
-    return row;
-  });
-}
-
-function computeDataFromCSV(rows) {
-  const numericCols = Object.keys(rows[0]).filter(k =>
-    rows.slice(0, 50).every(r => r[k] === '' || typeof r[k] === 'number')
-  );
-  const targetCol = numericCols[0];
-  const catCol = Object.keys(rows[0]).find(k => typeof rows[0][k] === 'string');
-  const n = rows.length;
-  const FRAC = 0.1;
-  const seed = [...rows].sort(() => 0.5 - Math.random());
-  const sample = seed.slice(0, Math.floor(n * FRAC));
-  const relErr = (e, a) => +((Math.abs(e - a) / Math.abs(e)) * 100).toFixed(2);
-
-  const exactSum = rows.reduce((s, r) => s + (r[targetCol] || 0), 0);
-  const sampleVals = sample.map(r => r[targetCol] || 0);
-  const sampleSum = sampleVals.reduce((a, b) => a + b, 0);
-  const approxSum = sampleSum / FRAC;
-  const exactAvg = exactSum / n;
-  const sampleMean = sampleSum / sampleVals.length;
-  const sampleStd = Math.sqrt(sampleVals.reduce((s, v) => s + (v - sampleMean) ** 2, 0) / (sampleVals.length - 1));
-  const moe = +(1.96 * (sampleStd / Math.sqrt(sampleVals.length))).toFixed(2);
-  const exactCount = n;
-  const approxCount = Math.round(sample.length / FRAC);
-
-  DATA['COUNT(*)'] = { exact: exactCount, approx: approxCount, errorPct: relErr(exactCount, approxCount), speedup: +(1/FRAC).toFixed(1) };
-  DATA[`SUM(${targetCol})`] = { exact: exactSum, approx: approxSum, errorPct: relErr(exactSum, approxSum), speedup: +(1/FRAC).toFixed(1) };
-  DATA[`AVG(${targetCol})`] = { exact: exactAvg, approx: sampleMean, errorPct: relErr(exactAvg, sampleMean), speedup: +(1/FRAC).toFixed(1), ci_low: sampleMean - moe, ci_high: sampleMean + moe, moe };
-  DATA['GROUP BY Product'] = { groupBy: true };
-
-  const exactGroups = {}, approxGroups = {};
-  rows.forEach(r => { const k = r[catCol] || 'Unknown'; exactGroups[k] = (exactGroups[k] || 0) + 1; });
-  sample.forEach(r => { const k = r[catCol] || 'Unknown'; approxGroups[k] = (approxGroups[k] || 0) + 1; });
-
-  GROUP_DATA.length = 0;
-  Object.keys(exactGroups).slice(0, 15).forEach(key => {
-    const exact = exactGroups[key];
-    const approx = Math.round((approxGroups[key] || 0) / FRAC);
-    GROUP_DATA.push({ product: key, exact, approx, error: relErr(exact, approx) });
-  });
-
-  document.querySelectorAll('.query-btn').forEach((btn, i) => {
-    const labels = [`COUNT(*)`, `SUM(${targetCol})`, `AVG(${targetCol})`, `GROUP BY ${catCol}`];
-    if (labels[i]) { btn.innerHTML = `<span class="query-dot"></span>${labels[i]}`; btn.onclick = () => selectQuery(btn, labels[i]); }
-  });
-}
-const DATA = {
-  'COUNT(*)':        { exact:186850, approx:186850, errorPct:0.00, speedup:3.2 },
-  'SUM(price)':      { exact:34492035.78, approx:34556712.30, errorPct:0.19, speedup:5.8 },
-  'AVG(price)':      { exact:184.58, approx:184.93, errorPct:0.19, speedup:4.1, ci_low:183.12, ci_high:186.74, moe:1.81 },
-  'GROUP BY Product':{ groupBy:true }
-};
-
-const GROUP_DATA = [
-  { product:'USB-C Cable',      exact:23975, approx:24120, error:0.60 },
-  { product:'Lightning Cable',  exact:23217, approx:23050, error:0.72 },
-  { product:'AAA Batteries',    exact:31017, approx:30840, error:0.57 },
-  { product:'AA Batteries',     exact:27635, approx:27900, error:0.96 },
-  { product:'Wired Headphones', exact:20557, approx:20330, error:1.10 },
-  { product:'iPhone',           exact:6849,  approx:6920,  error:1.04 },
-  { product:'Google Phone',     exact:5532,  approx:5480,  error:0.94 },
-  { product:'Macbook Pro',      exact:4728,  approx:4810,  error:1.73 },
-  { product:'27in Monitor',     exact:6244,  approx:6150,  error:1.51 },
-  { product:'ThinkPad',         exact:4130,  approx:4200,  error:1.69 },
-];
+let GROUP_DATA = [];
 
 let currentQuery = 'COUNT(*)';
 let currentMode  = 'both';
@@ -137,7 +37,7 @@ function resetResult() {
   document.getElementById('loading-state').style.display = 'none';
 }
 
-function runQuery() {
+async function runQuery() {
   const btn = document.getElementById('exec-btn');
   btn.disabled = true;
   btn.textContent = '⏳ Running...';
@@ -145,12 +45,45 @@ function runQuery() {
   document.getElementById('result-content').style.display = 'none';
   document.getElementById('loading-state').style.display = 'flex';
 
-  setTimeout(() => {
+  const fracVal = parseFloat(document.getElementById('frac-display').textContent);
+  const queryMap = { 'COUNT(*)': 'COUNT', 'SUM(price)': 'SUM', 'AVG(price)': 'AVG', 'GROUP BY Product': 'GROUP_BY' };
+  const queryType = queryMap[currentQuery] || 'COUNT';
+
+  try {
+    const res = await fetch('http://localhost:5000/api/query', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: queryType, column: 'price', sample_frac: fracVal })
+    });
+    const result = await res.json();
+
+    if (queryType === 'GROUP_BY') {
+      GROUP_DATA.length = 0;
+      result.exact.forEach(row => {
+        const approxRow = result.approx.find(r => r.Product === row.Product);
+        const approxCount = approxRow ? approxRow.approx_count : 0;
+        const error = +((Math.abs(row.exact_count - approxCount) / row.exact_count) * 100).toFixed(2);
+        GROUP_DATA.push({ product: row.Product, exact: row.exact_count, approx: approxCount, error });
+      });
+      DATA[currentQuery] = { groupBy: true };
+    } else {
+      const speedup = +(result.time_exact_ms / result.time_approx_ms).toFixed(1);
+      const errorPct = +((Math.abs(result.exact - result.approx) / Math.abs(result.exact)) * 100).toFixed(2);
+      DATA[currentQuery] = { exact: result.exact, approx: result.approx, errorPct, speedup, ...(result.moe !== undefined && { moe: result.moe, ci_low: result.approx - result.moe, ci_high: result.approx + result.moe }) };
+    }
+  } catch (err) {
+    document.getElementById('loading-state').style.display = 'none';
+    document.getElementById('empty-state').style.display = 'flex';
     btn.disabled = false;
     btn.textContent = '▶ Execute Query';
-    document.getElementById('loading-state').style.display = 'none';
-    renderResult();
-  }, 600 + Math.random() * 700);
+    alert('Backend not reachable. Make sure api.py is running on port 5000.');
+    return;
+  }
+
+  btn.disabled = false;
+  btn.textContent = '▶ Execute Query';
+  document.getElementById('loading-state').style.display = 'none';
+  renderResult();
 }
 
 function badgeClass(e) {
